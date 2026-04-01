@@ -7,3 +7,4 @@
 
 export { createFormatters } from './format.mjs';
 export { createPreprocessor } from './preprocessor.mjs';
+export { discoverModules, createAutoPreprocessor } from './discover.mjs';

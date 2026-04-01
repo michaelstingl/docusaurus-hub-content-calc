@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.mjs",
     "./format": "./src/format.mjs",
-    "./preprocessor": "./src/preprocessor.mjs"
+    "./preprocessor": "./src/preprocessor.mjs",
+    "./discover": "./src/discover.mjs"
   },
   "main": "./src/index.mjs",
   "types": "./types/index.d.ts",

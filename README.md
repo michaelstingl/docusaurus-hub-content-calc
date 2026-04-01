@@ -8,36 +8,43 @@ Content calculation preprocessor for [Docusaurus Hub](https://github.com/michael
 bun add @michaelstingl/docusaurus-hub-content-calc@github:michaelstingl/docusaurus-hub-content-calc
 ```
 
-## Usage
+## Quick Start (Auto-Discovery)
 
 ### 1. Create a calculation module
 
+Drop a `.mjs` file into `plugins/calc/`:
+
 ```js
-// plugins/pricing.mjs
+// plugins/calc/pricing.mjs
 import { createFormatters } from '@michaelstingl/docusaurus-hub-content-calc';
 
-const { fmt, fmtDec } = createFormatters('de-DE');
+const { fmt, fmtDec } = createFormatters('en-US');
 
-export const pathPattern = 'docs/pricing/';
+export const pathPattern = 'content/docs/';
 
 export const values = {
-  'pricing.base':   fmtDec(9.99),    // → "9,99"
-  'pricing.annual': fmtDec(99.90),   // → "99,90"
-  'pricing.users':  fmt(1500),       // → "1.500"
+  'pricing.base':   fmtDec(9.99),    // → "9.99"
+  'pricing.annual': fmtDec(99.90),   // → "99.90"
+  'pricing.users':  fmt(1500),       // → "1,500"
 };
 ```
 
-### 2. Wire up the preprocessor
+### 2. Wire up auto-discovery (once)
 
 ```ts
 // docusaurus.config.ts
-import { createPreprocessor } from '@michaelstingl/docusaurus-hub-content-calc';
-import * as pricing from './plugins/pricing.mjs';
+export default async function createConfigAsync() {
+  const { createAutoPreprocessor } = await import(
+    '@michaelstingl/docusaurus-hub-content-calc'
+  );
+  const preprocessor = await createAutoPreprocessor('./plugins/calc');
 
-const config = {
-  markdown: {
-    preprocessor: createPreprocessor([pricing]),
-  },
+  return {
+    markdown: {
+      preprocessor,  // undefined if no modules found
+    },
+    // ...
+  };
 };
 ```
 
@@ -46,6 +53,32 @@ const config = {
 ```markdown
 The base plan costs **{{pricing.base}} €/month** ({{pricing.annual}} €/year).
 Currently serving {{pricing.users}} users.
+```
+
+**That's it.** Add more modules by dropping files into `plugins/calc/` — no config changes needed.
+
+## Graceful Degradation
+
+| Scenario | Behavior |
+|----------|----------|
+| `plugins/calc/` doesn't exist | No preprocessing, no error |
+| `plugins/calc/` is empty | No preprocessing, no error |
+| A module fails to load | Warning logged, module skipped |
+| Package not installed | `import()` fails silently in async config |
+
+## Manual Setup
+
+For explicit control, use `createPreprocessor()` directly:
+
+```ts
+import { createPreprocessor } from '@michaelstingl/docusaurus-hub-content-calc';
+import * as pricing from './plugins/calc/pricing.mjs';
+
+const config = {
+  markdown: {
+    preprocessor: createPreprocessor([pricing]),
+  },
+};
 ```
 
 ## Formatters
@@ -65,26 +98,23 @@ const { fmt, fmtDec, rund, approx } = createFormatters('de-DE');
 
 Default locale is `de-DE`. Pass any [BCP 47 locale string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
 
-## CalcModule interface
+## CalcModule Interface
 
 Each calculation module exports:
 
 ```ts
-interface CalcModule {
-  pathPattern: string;              // files matching this path are processed
-  values: Record<string, string>;   // {{key}} → replacement value
-}
+export const pathPattern: string;              // files matching this path are processed
+export const values: Record<string, string>;   // {{key}} → replacement value
 ```
 
-## How it works
+## API
 
-The `createPreprocessor()` factory returns a [Docusaurus markdown preprocessor](https://docusaurus.io/docs/markdown-features#preprocessor) that:
-
-1. Checks each file's path against each module's `pathPattern`
-2. Replaces `{{key}}` placeholders with values from matching modules
-3. Leaves unmatched placeholders untouched
-
-Only files whose path includes a module's `pathPattern` are processed, so unrelated docs have zero overhead.
+| Export | Description |
+|--------|-------------|
+| `createAutoPreprocessor(dir)` | Auto-discover modules + create preprocessor. Returns `undefined` if empty. |
+| `discoverModules(dir)` | Scan directory, return array of `CalcModule`. |
+| `createPreprocessor(modules)` | Create preprocessor from explicit module array. |
+| `createFormatters(locale?)` | Create locale-bound number formatters. |
 
 ## License
 

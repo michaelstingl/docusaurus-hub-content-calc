@@ -33,3 +33,20 @@ export function createFormatters(locale?: string): Formatters;
 export function createPreprocessor(
   modules: CalcModule[]
 ): (args: { fileContent: string; filePath: string }) => string;
+
+/**
+ * Auto-discover calc modules in a directory.
+ * Scans for .mjs files that export pathPattern and values.
+ * Returns empty array if directory doesn't exist or contains no valid modules.
+ * @param dir - Path to scan (relative to cwd or absolute)
+ */
+export function discoverModules(dir: string): Promise<CalcModule[]>;
+
+/**
+ * Auto-discover modules and create a preprocessor.
+ * Returns undefined if no modules found — safe to pass directly to Docusaurus config.
+ * @param dir - Path to scan (relative to cwd or absolute)
+ */
+export function createAutoPreprocessor(
+  dir: string
+): Promise<((args: { fileContent: string; filePath: string }) => string) | undefined>;
