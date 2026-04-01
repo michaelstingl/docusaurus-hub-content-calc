@@ -1,0 +1,30 @@
+{
+  "name": "@michaelstingl/docusaurus-hub-content-calc",
+  "version": "1.0.0",
+  "description": "Content calculation preprocessor for Docusaurus Hub — replaces {{key}} placeholders in markdown with computed values",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./format": "./src/format.mjs",
+    "./preprocessor": "./src/preprocessor.mjs"
+  },
+  "main": "./src/index.mjs",
+  "types": "./types/index.d.ts",
+  "files": [
+    "src/",
+    "types/"
+  ],
+  "keywords": [
+    "docusaurus",
+    "markdown",
+    "preprocessor",
+    "content",
+    "calculation"
+  ],
+  "author": "Michael Stingl",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michaelstingl/docusaurus-hub-content-calc.git"
+  }
+}
