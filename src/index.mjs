@@ -5,5 +5,5 @@
  * Replaces {{key}} placeholders in markdown with computed values.
  */
 
-export { fmt, fmtDec, rund, approx } from './format.mjs';
+export { createFormatters } from './format.mjs';
 export { createPreprocessor } from './preprocessor.mjs';

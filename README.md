@@ -14,7 +14,9 @@ bun add @michaelstingl/docusaurus-hub-content-calc@github:michaelstingl/docusaur
 
 ```js
 // plugins/pricing.mjs
-import { fmt, fmtDec } from '@michaelstingl/docusaurus-hub-content-calc';
+import { createFormatters } from '@michaelstingl/docusaurus-hub-content-calc';
+
+const { fmt, fmtDec } = createFormatters('de-DE');
 
 export const pathPattern = 'docs/pricing/';
 
@@ -48,14 +50,20 @@ Currently serving {{pricing.users}} users.
 
 ## Formatters
 
-German-locale number formatters for display-ready strings:
+Locale-aware number formatters via `createFormatters(locale)`:
 
-| Function | Example | Output |
-|----------|---------|--------|
-| `fmt(n)` | `fmt(18884)` | `"18.884"` |
-| `fmtDec(n)` | `fmtDec(49.9)` | `"49,90"` |
-| `rund(n)` | `rund(18884)` | `"~19.000"` |
-| `approx(n)` | `approx(18884)` | `"~18.884"` |
+```js
+const { fmt, fmtDec, rund, approx } = createFormatters('de-DE');
+```
+
+| Function | de-DE | en-US |
+|----------|-------|-------|
+| `fmt(18884)` | `"18.884"` | `"18,884"` |
+| `fmtDec(49.9)` | `"49,90"` | `"49.90"` |
+| `rund(18884)` | `"~19.000"` | `"~19,000"` |
+| `approx(18884)` | `"~18.884"` | `"~18,884"` |
+
+Default locale is `de-DE`. Pass any [BCP 47 locale string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
 
 ## CalcModule interface
 
